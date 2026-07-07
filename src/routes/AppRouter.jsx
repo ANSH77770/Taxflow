@@ -8,6 +8,7 @@ import Invoices from "../pages/Invoices";
 import Reports from "../pages/Reports";
 import Settings from "../pages/Settings";
 import Login from "../pages/Login";
+import InvoicePreview from "../pages/InvoicePreview";
 
 import MainLayout from "../layouts/MainLayout";
 
@@ -15,11 +16,16 @@ export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+
         {/* Public Routes */}
         <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
 
-        {/* Dashboard Routes */}
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        {/* Dashboard */}
         <Route
           path="/dashboard"
           element={
@@ -29,6 +35,7 @@ export default function AppRouter() {
           }
         />
 
+        {/* Customers */}
         <Route
           path="/customers"
           element={
@@ -38,6 +45,7 @@ export default function AppRouter() {
           }
         />
 
+        {/* Products */}
         <Route
           path="/products"
           element={
@@ -47,6 +55,7 @@ export default function AppRouter() {
           }
         />
 
+        {/* Invoices */}
         <Route
           path="/invoices"
           element={
@@ -56,6 +65,17 @@ export default function AppRouter() {
           }
         />
 
+        {/* Invoice Preview */}
+        <Route
+          path="/invoice-preview"
+          element={
+            <MainLayout>
+              <InvoicePreview />
+            </MainLayout>
+          }
+        />
+
+        {/* Reports */}
         <Route
           path="/reports"
           element={
@@ -65,6 +85,7 @@ export default function AppRouter() {
           }
         />
 
+        {/* Settings */}
         <Route
           path="/settings"
           element={
@@ -73,6 +94,7 @@ export default function AppRouter() {
             </MainLayout>
           }
         />
+
       </Routes>
     </BrowserRouter>
   );
