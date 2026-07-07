@@ -4,29 +4,53 @@ import { useCustomerStore } from "../../store/useCustomerStore";
 export default function CustomerStats() {
   const customers = useCustomerStore((state) => state.customers);
 
+  const totalCustomers = customers.length;
+
+  const gstRegistered = customers.filter(
+    (customer) => customer.gstin.trim() !== ""
+  ).length;
+
+  const newCustomers = customers.slice(-3).length;
+
+  const stats = [
+    {
+      title: "Total Customers",
+      value: totalCustomers,
+      icon: Users,
+      color: "text-blue-600",
+    },
+    {
+      title: "GST Registered",
+      value: gstRegistered,
+      icon: BadgeCheck,
+      color: "text-green-600",
+    },
+    {
+      title: "New Customers",
+      value: newCustomers,
+      icon: UserPlus,
+      color: "text-purple-600",
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-      <div className="rounded-xl border bg-white p-6 shadow">
-        <Users className="mb-3 text-blue-600" size={30} />
-        <h2 className="text-3xl font-bold">
-          {customers.length}
-        </h2>
-        <p className="text-gray-500">Total Customers</p>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {stats.map((item) => {
+        const Icon = item.icon;
 
-      <div className="rounded-xl border bg-white p-6 shadow">
-        <BadgeCheck className="mb-3 text-green-600" size={30} />
-        <h2 className="text-3xl font-bold">
-          {customers.length}
-        </h2>
-        <p className="text-gray-500">GST Registered</p>
-      </div>
+        return (
+          <div
+            key={item.title}
+            className="rounded-xl bg-white border shadow-sm p-6"
+          >
+            <Icon className={`${item.color} mb-3`} size={32} />
 
-      <div className="rounded-xl border bg-white p-6 shadow">
-        <UserPlus className="mb-3 text-purple-600" size={30} />
-        <h2 className="text-3xl font-bold">2</h2>
-        <p className="text-gray-500">New This Month</p>
-      </div>
+            <h2 className="text-3xl font-bold">{item.value}</h2>
+
+            <p className="text-gray-500">{item.title}</p>
+          </div>
+        );
+      })}
     </div>
   );
 }
