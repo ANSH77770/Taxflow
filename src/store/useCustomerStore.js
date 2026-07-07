@@ -3,16 +3,16 @@ import { create } from "zustand";
 export const useCustomerStore = create((set) => ({
   customers: [
     {
-      id: 1,
+      id: crypto.randomUUID(),
       name: "ABC Traders",
-      gst: "07ABCDE1234F1Z5",
+      gstin: "07ABCDE1234F1Z5",
       phone: "9876543210",
       email: "abc@gmail.com",
     },
     {
-      id: 2,
+      id: crypto.randomUUID(),
       name: "XYZ Pvt Ltd",
-      gst: "29ABCDE6789K1Z2",
+      gstin: "29ABCDE5678A1Z9",
       phone: "9988776655",
       email: "xyz@gmail.com",
     },
@@ -20,6 +20,17 @@ export const useCustomerStore = create((set) => ({
 
   addCustomer: (customer) =>
     set((state) => ({
-      customers: [...state.customers, customer],
+      customers: [
+        ...state.customers,
+        {
+          id: crypto.randomUUID(),
+          ...customer,
+        },
+      ],
+    })),
+
+  deleteCustomer: (id) =>
+    set((state) => ({
+      customers: state.customers.filter((c) => c.id !== id),
     })),
 }));
