@@ -29,6 +29,7 @@ export const useInvoiceStore = create((set) => ({
 
   addProduct: (product) =>
     set((state) => {
+
       const existing = state.items.find(
         (item) => item.id === product.id
       );
@@ -57,13 +58,6 @@ export const useInvoiceStore = create((set) => ({
       };
     }),
 
-  removeProduct: (id) =>
-    set((state) => ({
-      items: state.items.filter(
-        (item) => item.id !== id
-      ),
-    })),
-
   updateQty: (id, qty) =>
     set((state) => ({
       items: state.items.map((item) =>
@@ -89,6 +83,13 @@ export const useInvoiceStore = create((set) => ({
                 Number(discount) || 0,
             }
           : item
+      ),
+    })),
+
+  removeProduct: (id) =>
+    set((state) => ({
+      items: state.items.filter(
+        (item) => item.id !== id
       ),
     })),
 

@@ -5,17 +5,25 @@ import { useCustomerStore } from "../../store/useCustomerStore";
 import { calculateInvoice } from "../../utils/invoiceCalculations";
 
 export default function InvoiceActions() {
-  const items = useInvoiceStore((state) => state.items);
-  const customerId = useInvoiceStore((state) => state.customer);
+  const {
+    customer,
+    items,
+    shipping,
+    roundOff,
+    notes,
+    clearInvoice,
+  } = useInvoiceStore();
 
-  const customers = useCustomerStore((state) => state.customers);
+  const customers = useCustomerStore(
+    (state) => state.customers
+  );
 
   const saveInvoice = useInvoiceHistoryStore(
     (state) => state.saveInvoice
   );
 
   function handleSaveDraft() {
-    if (!customerId) {
+    if (!customer) {
       alert("Please select a customer.");
       return;
     }
@@ -25,37 +33,95 @@ export default function InvoiceActions() {
       return;
     }
 
-    const customer = customers.find(
-      (c) => c.id === customerId
+    const customerData = customers.find(
+      (c) => c.id === customer
     );
 
-    const totals = calculateInvoice(items);
+    const totals = calculateInvoice(
+      items,
+      shipping,
+      roundOff
+    );
 
     saveInvoice({
-      customer: customer?.name || "Unknown Customer",
-      customerId,
-      date: new Date().toLocaleDateString("en-IN"),
+      invoiceNo:
+        "INV-" +
+        Date.now().toString().slice(-6),
+
+      customerId: customer,
+
+      customer:
+        customerData?.name ||
+        "Unknown Customer",
+
+      date: new Date().toLocaleDateString(
+        "en-IN"
+      ),
+
       status: "Draft",
-      total: totals.total,
+
+      shipping,
+
+      roundOff,
+
+      notes,
+
       items,
+
+      subtotal: totals.subtotal,
+
+      discount: totals.discount,
+
+      taxableValue:
+        totals.taxableValue,
+
+      gst: totals.gst,
+
+      total: totals.total,
     });
 
-    alert("Invoice saved successfully!");
+    alert("Invoice saved successfully.");
+  }
+
+  function handleClear() {
+    if (
+      window.confirm(
+        "Clear this invoice?"
+      )
+    ) {
+      clearInvoice();
+    }
   }
 
   return (
-    <div className="flex gap-4">
-      <Button onClick={handleSaveDraft}>
+    <div className="space-y-4 rounded-xl border bg-white p-6 shadow-sm">
+
+      <Button
+        className="w-full"
+        onClick={handleSaveDraft}
+      >
         Save Draft
       </Button>
 
-      <Button variant="secondary">
-        Preview
+      <Button
+        variant="secondary"
+        className="w-full"
+      >
+        Preview Invoice
       </Button>
 
-      <Button>
+      <Button className="w-full">
         Generate PDF
       </Button>
+
+      <Button
+        variant="destructive"
+        className="w-full"
+        onClick={handleClear}
+      >
+        Clear Invoice
+      </Button>
+
     </div>
   );
 }

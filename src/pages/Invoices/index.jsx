@@ -9,56 +9,52 @@ import InvoiceCustomerCard from "../../components/invoice/InvoiceCustomerCard";
 
 import ProductSelector from "../../components/invoice/ProductSelector";
 import InvoiceTable from "../../components/invoice/InvoiceTable";
-import InvoiceSummary from "../../components/invoice/InvoiceSummary";
 
+import InvoiceSummary from "../../components/invoice/InvoiceSummary";
 import InvoiceActions from "../../components/invoice/InvoiceActions";
+
 import InvoiceHistory from "../../components/invoice/InvoiceHistory";
 
 export default function Invoices() {
-  const [customer, setCustomer] = useState("");
+  const [customer, setCustomer] =
+    useState("");
 
   return (
-  <div className="space-y-8">
+    <div className="space-y-8">
 
-    {/* Header */}
-    <InvoiceHeader />
+      <InvoiceHeader />
 
-    {/* Top Section */}
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid gap-6 lg:grid-cols-2">
 
-      <CompanyProfile />
+        <CompanyProfile />
 
-      <InvoiceDetails />
+        <InvoiceDetails />
+
+      </div>
+
+      <CustomerSelector
+        value={customer}
+        onChange={setCustomer}
+      />
+
+      <InvoiceCustomerCard
+        customerId={customer}
+      />
+
+      <ProductSelector />
+
+      <InvoiceTable />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+
+        <InvoiceSummary />
+
+        <InvoiceActions />
+
+      </div>
+
+      <InvoiceHistory />
 
     </div>
-
-    {/* Customer */}
-    <CustomerSelector
-      value={customer}
-      onChange={setCustomer}
-    />
-
-    {/* Customer Details */}
-    <InvoiceCustomerCard customerId={customer} />
-
-    {/* Products */}
-    <ProductSelector />
-
-    {/* Invoice Table */}
-    <InvoiceTable />
-
-    {/* Bottom Section */}
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-
-      <InvoiceActions />
-
-      <InvoiceSummary />
-
-    </div>
-
-    {/* History */}
-    <InvoiceHistory />
-
-  </div>
-);
+  );
 }
