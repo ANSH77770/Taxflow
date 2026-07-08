@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 export const useInvoiceStore = create((set) => ({
+
   customer: "",
 
   items: [],
@@ -10,6 +11,8 @@ export const useInvoiceStore = create((set) => ({
   roundOff: 0,
 
   notes: "",
+
+  editingInvoiceId: null,
 
   setCustomer: (customer) =>
     set({ customer }),
@@ -93,6 +96,26 @@ export const useInvoiceStore = create((set) => ({
       ),
     })),
 
+  loadInvoice: (invoice) =>
+    set({
+      customer: invoice.customerId,
+      items: invoice.items,
+      shipping: invoice.shipping,
+      roundOff: invoice.roundOff,
+      notes: invoice.notes,
+      editingInvoiceId: invoice.id,
+    }),
+
+  setEditingInvoice: (id) =>
+    set({
+      editingInvoiceId: id,
+    }),
+
+  clearEditingInvoice: () =>
+    set({
+      editingInvoiceId: null,
+    }),
+
   clearInvoice: () =>
     set({
       customer: "",
@@ -100,5 +123,7 @@ export const useInvoiceStore = create((set) => ({
       shipping: 0,
       roundOff: 0,
       notes: "",
+      editingInvoiceId: null,
     }),
+
 }));

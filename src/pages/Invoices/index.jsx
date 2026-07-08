@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import InvoiceHeader from "../../components/invoice/InvoiceHeader";
 import CompanyProfile from "../../components/invoice/CompanyProfile";
 import InvoiceDetails from "../../components/invoice/InvoiceDetails";
@@ -15,9 +13,13 @@ import InvoiceActions from "../../components/invoice/InvoiceActions";
 
 import InvoiceHistory from "../../components/invoice/InvoiceHistory";
 
+import { useInvoiceStore } from "../../store/useInvoiceStore";
+
 export default function Invoices() {
-  const [customer, setCustomer] =
-    useState("");
+
+  const customer = useInvoiceStore(
+    (state) => state.customer
+  );
 
   return (
     <div className="space-y-8">
@@ -32,10 +34,7 @@ export default function Invoices() {
 
       </div>
 
-      <CustomerSelector
-        value={customer}
-        onChange={setCustomer}
-      />
+      <CustomerSelector />
 
       <InvoiceCustomerCard
         customerId={customer}

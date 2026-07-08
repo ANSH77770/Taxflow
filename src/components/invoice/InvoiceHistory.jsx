@@ -1,7 +1,16 @@
-import { Trash2 } from "lucide-react";
+import { useState } from "react";
+
 import { useInvoiceHistoryStore } from "../../store/useInvoiceHistoryStore";
+import { useInvoiceStore } from "../../store/useInvoiceStore";
+
+import InvoiceStats from "./InvoiceStats";
+import InvoiceToolbar from "./InvoiceToolbar";
+import InvoiceHistoryTable from "./InvoiceHistoryTable";
+import DeleteInvoiceDialog from "./DeleteInvoiceDialog";
+import InvoiceViewModal from "./InvoiceViewModal";
 
 export default function InvoiceHistory() {
+
   const invoices = useInvoiceHistoryStore(
     (state) => state.invoices
   );
@@ -10,95 +19,126 @@ export default function InvoiceHistory() {
     (state) => state.deleteInvoice
   );
 
+  const loadInvoice = useInvoiceStore(
+    (state) => state.loadInvoice
+  );
+
+  const [search, setSearch] = useState("");
+
+  const [deleteOpen, setDeleteOpen] =
+    useState(false);
+
+  const [viewOpen, setViewOpen] =
+    useState(false);
+
+  const [selectedInvoice, setSelectedInvoice] =
+    useState(null);
+
+  const filteredInvoices = invoices.filter((invoice) => {
+
+    const query = search.toLowerCase();
+
+    return (
+      invoice.customer
+        .toLowerCase()
+        .includes(query) ||
+      invoice.status
+        .toLowerCase()
+        .includes(query) ||
+      invoice.date
+        .toLowerCase()
+        .includes(query)
+    );
+
+  });
+
+  function handleView(invoice) {
+    setSelectedInvoice(invoice);
+    setViewOpen(true);
+  }
+
+  function handleEdit(invoice) {
+
+    loadInvoice(invoice);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
+  }
+
+  function handleDownload(invoice) {
+    console.log("Download", invoice);
+
+    // Connect PDF here later
+  }
+
+  function handleDelete(invoice) {
+    setSelectedInvoice(invoice);
+    setDeleteOpen(true);
+  }
+
+  function confirmDelete() {
+
+    if (!selectedInvoice) return;
+
+    deleteInvoice(selectedInvoice.id);
+
+    setDeleteOpen(false);
+
+    setSelectedInvoice(null);
+
+  }
+
   return (
-    <div className="rounded-xl border bg-white p-6">
+    <div className="space-y-8">
 
-      <h2 className="text-2xl font-bold mb-6">
-        Recent Invoices
-      </h2>
+      <div>
 
-      {invoices.length === 0 ? (
-        <p className="text-gray-500">
-          No invoices saved yet.
+        <h2 className="text-3xl font-bold">
+          Invoice History
+        </h2>
+
+        <p className="mt-2 text-gray-500">
+          View and manage all generated invoices.
         </p>
-      ) : (
-        <table className="w-full">
 
-          <thead>
-            <tr className="border-b">
+      </div>
 
-              <th className="text-left py-3">
-                Customer
-              </th>
+      <InvoiceStats />
 
-              <th className="text-left">
-                Date
-              </th>
+      <InvoiceToolbar
+        search={search}
+        setSearch={setSearch}
+      />
 
-              <th className="text-left">
-                Status
-              </th>
+      <InvoiceHistoryTable
+        invoices={filteredInvoices}
+        onView={handleView}
+        onEdit={handleEdit}
+        onDownload={handleDownload}
+        onDelete={handleDelete}
+      />
 
-              <th className="text-right">
-                Total
-              </th>
+      <InvoiceViewModal
+        open={viewOpen}
+        invoice={selectedInvoice}
+        onClose={() => {
+          setViewOpen(false);
+          setSelectedInvoice(null);
+        }}
+      />
 
-              <th></th>
-
-            </tr>
-          </thead>
-
-          <tbody>
-
-            {invoices.map((invoice) => (
-              <tr key={invoice.id} className="border-b">
-
-                <td className="py-4">
-                  {invoice.customer}
-                </td>
-
-                <td>
-                  {invoice.date}
-                </td>
-
-                <td>
-
-                  <span className="rounded-full bg-blue-100 px-3 py-1 text-blue-700 text-sm">
-
-                    {invoice.status}
-
-                  </span>
-
-                </td>
-
-                <td className="text-right">
-
-                  ₹{invoice.total.toFixed(2)}
-
-                </td>
-
-                <td className="text-right">
-
-                  <button
-                    onClick={() =>
-                      deleteInvoice(invoice.id)
-                    }
-                  >
-                    <Trash2
-                      size={18}
-                      className="text-red-500"
-                    />
-                  </button>
-
-                </td>
-
-              </tr>
-            ))}
-
-          </tbody>
-
-        </table>
-      )}
+      <DeleteInvoiceDialog
+        open={deleteOpen}
+        invoice={selectedInvoice}
+        onClose={() => {
+          setDeleteOpen(false);
+          setSelectedInvoice(null);
+        }}
+        onConfirm={confirmDelete}
+      />
 
     </div>
   );

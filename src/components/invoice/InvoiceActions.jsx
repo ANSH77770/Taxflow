@@ -18,15 +18,18 @@ export default function InvoiceActions() {
     roundOff,
     notes,
     clearInvoice,
+    editingInvoiceId,
+    clearEditingInvoice,
   } = useInvoiceStore();
 
   const customers = useCustomerStore(
     (state) => state.customers
   );
 
-  const saveInvoice = useInvoiceHistoryStore(
-    (state) => state.saveInvoice
-  );
+  const {
+    saveInvoice,
+    updateInvoice,
+  } = useInvoiceHistoryStore();
 
   const customerData = customers.find(
     (c) => c.id === customer
@@ -52,47 +55,94 @@ export default function InvoiceActions() {
     return true;
   }
 
+  function getInvoiceData(status) {
+    return {
+      invoiceNo:
+        "INV-" + Date.now().toString().slice(-6),
+
+      customerId: customer,
+
+      customer:
+        customerData?.name ||
+        "Unknown Customer",
+
+      date: new Date().toLocaleDateString(
+        "en-IN"
+      ),
+
+      status,
+
+      shipping,
+
+      roundOff,
+
+      notes,
+
+      items,
+
+      subtotal: totals.subtotal,
+
+      discount: totals.discount,
+
+      taxableValue: totals.taxableValue,
+
+      gst: totals.gst,
+
+      total: totals.total,
+    };
+  }
+
   function handleSaveDraft() {
     if (!validateInvoice()) return;
 
-    saveInvoice({
-      invoiceNo: "INV-" + Date.now().toString().slice(-6),
-      customerId: customer,
-      customer: customerData?.name || "Unknown Customer",
-      date: new Date().toLocaleDateString("en-IN"),
-      status: "Draft",
-      shipping,
-      roundOff,
-      notes,
-      items,
-      subtotal: totals.subtotal,
-      discount: totals.discount,
-      taxableValue: totals.taxableValue,
-      gst: totals.gst,
-      total: totals.total,
-    });
+    const invoice =
+      getInvoiceData("Draft");
 
-    alert("Invoice saved successfully.");
+    if (editingInvoiceId) {
+      updateInvoice(
+        editingInvoiceId,
+        invoice
+      );
+
+      alert("Invoice updated.");
+    } else {
+      saveInvoice(invoice);
+
+      alert("Invoice saved.");
+    }
+
+    clearEditingInvoice();
   }
 
   function handlePreview() {
     if (!validateInvoice()) return;
+
     navigate("/invoice-preview");
   }
 
- function handlePDF() {
-  console.log("Generate PDF clicked");
+  function handlePDF() {
+    if (!validateInvoice()) return;
 
-  if (!validateInvoice()) return;
+    const invoice =
+      getInvoiceData("Generated");
 
-  console.log("Validation passed");
+    if (editingInvoiceId) {
+      updateInvoice(
+        editingInvoiceId,
+        invoice
+      );
+    } else {
+      saveInvoice(invoice);
+    }
 
-  generateInvoicePDF(
-    customerData,
-    items,
-    totals
-  );
-}
+    generateInvoicePDF(
+      customerData,
+      items,
+      totals
+    );
+
+    clearEditingInvoice();
+  }
 
   return (
     <div className="space-y-4 rounded-xl border bg-white p-6 shadow-sm">
@@ -101,7 +151,9 @@ export default function InvoiceActions() {
         className="w-full"
         onClick={handleSaveDraft}
       >
-        Save Draft
+        {editingInvoiceId
+          ? "Update Draft"
+          : "Save Draft"}
       </Button>
 
       <Button
@@ -116,13 +168,18 @@ export default function InvoiceActions() {
         className="w-full"
         onClick={handlePDF}
       >
-        Generate PDF
+        {editingInvoiceId
+          ? "Update & Generate PDF"
+          : "Generate PDF"}
       </Button>
 
       <Button
         variant="destructive"
         className="w-full"
-        onClick={clearInvoice}
+        onClick={() => {
+          clearInvoice();
+          clearEditingInvoice();
+        }}
       >
         Clear Invoice
       </Button>
