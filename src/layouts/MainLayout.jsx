@@ -9,9 +9,11 @@ export default function MainLayout({ children }) {
       <div className="flex flex-1 flex-col">
         <Navbar />
 
-        <main className="flex-1 p-8">
-          {children}
-        </main>
+        <main className="flex-1 bg-slate-100">
+  <div className="mx-auto max-w-7xl p-8">
+    {children}
+  </div>
+</main>
       </div>
     </div>
   );

@@ -4,17 +4,16 @@ import { products } from "../data/products";
 export const useProductStore = create((set) => ({
 
   products,
-
-  addProduct: (product) =>
-    set((state) => ({
-      products: [
-        ...state.products,
-        {
-          id: crypto.randomUUID(),
-          ...product,
-        },
-      ],
-    })),
+addProduct: (product) =>
+  set((state) => ({
+    products: [
+      {
+        id: crypto.randomUUID(),
+        ...product,
+      },
+      ...state.products,
+    ],
+  })),
 
   updateProduct: (id, updatedData) =>
     set((state) => ({
